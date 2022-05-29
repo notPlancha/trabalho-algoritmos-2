@@ -1,7 +1,8 @@
-from tkinter.tix import Tree
 from typing import Tuple, Dict, Set, Iterable, Iterator
 from numbers import Real
 
+
+# from UnionFind import UnionFind
 
 class Vertex:
     def __init__(self, e):
@@ -19,7 +20,7 @@ class Vertex:
         return hash(id(self))
 
     def __str__(self):
-        return f"${str(self.__element)}$"
+        return f"º{str(self.__element)}º"
 
     def __repr__(self):
         return str(self)
@@ -35,7 +36,7 @@ class Edge:
         return self.aresta[item]
 
     def __str__(self):
-        return f"%{str(self.aresta[0])} {('->' if self.isDirected else '<->')} {str(self.aresta[1])} ; peso = {self.peso}%"
+        return f"{str(self.aresta[0])} {('->' if self.isDirected else '<->')} {str(self.aresta[1])} ; peso = {self.peso}"
 
     def __repr__(self):
         return str(self)
@@ -50,6 +51,42 @@ class Edge:
             return self.aresta[0]
         else:
             raise AttributeError
+
+
+class UnionFind:
+    def __init__(self, vertices: Set[Vertex]):
+        self.__parent: Dict[Vertex, Vertex] = dict()
+        self.__rank: Dict[Vertex, int] = dict()
+        self.__size: Dict[Vertex, int] = dict()
+        for v in vertices:
+            self.__make_set(v)
+
+    def __make_set(self, v: Vertex) -> None:
+        self.__parent[v] = v
+        self.__rank[v] = 0
+        self.__size[v] = 1
+
+    def find(self, v: Vertex) -> Vertex:
+        if self.__parent[v] is not v:
+            self.__parent[v] = self.find(self.__parent[v])
+        return self.__parent[v]
+
+    def union(self, v1: Vertex, v2: Vertex) -> None:
+        v1_root = self.find(v1)
+        v2_root = self.find(v2)
+        if v1_root is v2_root:
+            return
+        if self.__rank[v1_root] > self.__rank[v2_root]:
+            self.__parent[v2_root] = v1_root
+            self.__size[v1_root] += self.__size[v2_root]
+        else:
+            self.__parent[v1_root] = v2_root
+            self.__size[v2_root] += self.__size[v1_root]
+            if self.__rank[v1_root] == self.__rank[v2_root]:
+                self.__rank[v2_root] += 1
+
+    def __str__(self):
+        return f"{self.__parent}"
 
 
 class Graph:
@@ -103,28 +140,32 @@ class Graph:
                     if i[1] is v:
                         yield i[0]
 
-    def insert_vertex(self, v: Vertex):
+    def insert_vertex(self, v: Vertex) -> Vertex:
         if not isinstance(v, Vertex):
             v = Vertex(v)
         self._insert_vertex(v)
         return v
 
-    def _insert_vertex(self, v: Vertex):
-        # skips verification
+    # returns False if vertex was already in the graph
+    def _insert_vertex(self, v: Vertex) -> bool:
+        # skips argument verification
+        if v in self._vertices: return False
         self._vertices.add(v)
         self._map[v] = dict()
+        return True
 
-    def _insert_edge(self, e: Edge):
-        # skips verification
-        if self.isDirected == e.isDirected:
-            self._map[e.aresta[0]][e.aresta[1]] = e
-            self._map[e.aresta[1]][e.aresta[0]] = e
-            self._edges.add(e)
-            return e
-        else:
-            raise AttributeError(f"Edge is{' not ' if not e.isDirected else ''}directed")
+    # returns False if edge was already in the graph
+    def _insert_edge(self, e: Edge) -> bool:
+        # skips argument verification
+        if e in self._edges: return False
+        if self.isDirected != e.isDirected: raise AttributeError(
+            f"Edge is{' not ' if not e.isDirected else ''}directed")
+        self._map[e.aresta[0]][e.aresta[1]] = e
+        self._map[e.aresta[1]][e.aresta[0]] = e
+        self._edges.add(e)
+        return True
 
-    def insert_edge(self, e: Edge, *args):
+    def insert_edge(self, e: Edge, *args) -> Edge:
         if not isinstance(e, Edge):
             if not isinstance(e, tuple):
                 try:
@@ -153,53 +194,55 @@ class Graph:
         del self._map[v]
 
     def __str__(self):
-        return str(self._map)
-
-    @staticmethod
-    def fromEdges(edges: Iterable) -> "Graph":
-        ret = Graph()
-        for i in edges:
-            ret._insert_vertex(i[0])
-            ret._insert_vertex(i[1])
-            ret._insert_edge(i)
+        ret = "Graph:\n"
+        for i in self._vertices:
+            ret += f"{i}\n"
+            for i in self._map[i].values():
+                ret += f"\t{i}\n"
+            ret += "\n"
+        ret += f"Vertices: {len(self._vertices)}\n"
+        ret += f"Edges: {len(self._edges)}\n"
         return ret
 
     def kruskal(self) -> "Graph":  # MST
-        #TODO test
-        # not checking if graph is disconnected
         if self.isDirected: raise AttributeError
-        retVertices = set()
-        retEdges = []
+        forest = UnionFind(self._vertices)
+        # print(forest)
+        ret = Graph()
         orderedEdges = sorted(self._edges, key=lambda e: e.peso)
         for e in orderedEdges:
-            if e[0] not in retVertices or e[1] not in retVertices:
-                retVertices.update(e.aresta)
-                retEdges.append(e)
-        return Graph.fromEdges(retEdges)
+            if not forest.find(e.aresta[0]) is forest.find(e.aresta[1]):
+                # print(e)
+                ret._insert_vertex(e.aresta[0])
+                ret._insert_vertex(e.aresta[1])
+                ret._insert_edge(e)
+                forest.union(e.aresta[0], e.aresta[1])
+                # print(forest)
+
+        return ret
 
 
 if __name__ == "__main__":
+    #https://youtu.be/71UQH7Pr9kU TODO remove
     g = Graph()
-    v1 = g.insert_vertex(13)
-    v2 = g.insert_vertex(11)
-    v3 = g.insert_vertex(10)
-    '''
-    g.remove_vertex(v1)
-    '''
-    e1 = g.insert_edge(Edge(v1, v2, 10))
-    e2 = g.insert_edge(Edge(v1, v3, 90))
-    e3 = g.insert_edge(Edge(v2, v3, 67))
-    '''
-    g.remove_edge(e1)
-    '''
-    print(g.vertex_count())
-    print(g.vertices())
-    print(g.edges_count())
-    print(g.edges())
-    print(g.get_edge(v1, v2))
-    print(g.degree(v1))
-    '''
-    print(g.outdegree(v1))
-    print(g.indegree(v1))
-    '''
+    A = Vertex("A")
+    B = Vertex("B")
+    C = Vertex("C")
+    D = Vertex("D")
+    E = Vertex("E")
+    F = Vertex("F")
+    G = Vertex("G")
+    for i in [A, B, C, D, E, F, G]:
+        g.insert_vertex(i)
+    g.insert_edge(Edge(C, E, 1))
+    g.insert_edge(Edge(A, B, 2))
+    g.insert_edge(Edge(A, C, 3))
+    g.insert_edge(Edge(A, D, 3))
+    g.insert_edge(Edge(B, E, 3))
+    g.insert_edge(Edge(B, C, 4))
+    g.insert_edge(Edge(C, D, 5))
+    g.insert_edge(Edge(D, F, 7))
+    g.insert_edge(Edge(F, E, 8))
+    g.insert_edge(Edge(F, G, 9))
     print(g)
+    print(g.kruskal())
