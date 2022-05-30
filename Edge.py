@@ -9,7 +9,7 @@ class Edge:
         self.peso = peso
         self.isDirected = isDirected
 
-    def __getitem__(self, item):
+    def __getitem__(self, item: int):
         return self.aresta[item]
 
     def __str__(self):

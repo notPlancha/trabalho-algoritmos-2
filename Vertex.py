@@ -1,6 +1,10 @@
+from typing import Tuple
+
+
 class Vertex:
-    def __init__(self, e):
+    def __init__(self, e, color : None | Tuple[int, int, int] =None): #rgb color
         self.__element = e
+        self.color = color
 
     @property
     def id(self):

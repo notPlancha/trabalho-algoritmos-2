@@ -2,12 +2,13 @@ from typing import Dict, Set
 from Vertex import Vertex
 
 class UnionFind:
-    def __init__(self, vertices: Set[Vertex]):
+    def __init__(self, vertices: Set[Vertex] = None):
         self.__parent: Dict[Vertex, Vertex] = dict()
         self.__rank: Dict[Vertex, int] = dict()
         self.__size: Dict[Vertex, int] = dict()
-        for v in vertices:
-            self.__make_set(v)
+        if vertices is not None:
+            for v in vertices:
+                self.__make_set(v)
 
     def __make_set(self, v: Vertex) -> None:
         self.__parent[v] = v

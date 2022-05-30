@@ -1,6 +1,6 @@
 from Edge import Edge
 from Vertex import Vertex
-from typing import Dict, Set, Iterable
+from typing import Dict, Set, Iterable, List, Tuple
 from UnionFind import UnionFind
 
 DEBUG: bool = False
@@ -30,7 +30,6 @@ class Graph:
         uD = self._map.get(u)
         if uD is not None:
             return uD.get(v)
-
     def degree(self, v: Vertex, out=None):
         if out is None:
             return len(self._map[v])
@@ -51,11 +50,11 @@ class Graph:
             elif out:
                 for e in self._map[v].values():
                     if e[0] is v:
-                        yield e[1]
+                        yield e
             else:
                 for e in self._map[v].values():
                     if e[1] is v:
-                        yield e[0]
+                        yield e
 
     def insert_vertex(self, v: Vertex) -> Vertex:
         if not isinstance(v, Vertex):
@@ -121,11 +120,12 @@ class Graph:
         ret += f"Edges: {len(self._edges)}\n"
         return ret
 
-    def kruskal(self) -> "Graph":  # MST
+    def kruskal(self, saveEdges: bool = False) -> Tuple["Graph", List[Edge]]:  # MST, ordered Edges
         if self.isDirected: raise AttributeError
         forest = UnionFind(self._vertices)
         if DEBUG: print(forest)
         ret = Graph()
+        edgesToRet = []
         orderedEdges = sorted(self._edges, key=lambda e: e.peso)
         for e in orderedEdges:
             if not forest.find(e.aresta[0]) is forest.find(e.aresta[1]):
@@ -134,8 +134,9 @@ class Graph:
                 ret._insert_vertex(e.aresta[1])
                 ret._insert_edge(e)
                 forest.union(e.aresta[0], e.aresta[1])
+                if saveEdges: edgesToRet.append(e)
                 if DEBUG: print(forest)
-        return ret
+        return ret, edgesToRet
 
 
 GraphG = Graph()
