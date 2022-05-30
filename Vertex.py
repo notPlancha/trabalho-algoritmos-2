@@ -18,7 +18,7 @@ class Vertex:
         return hash(id(self))
 
     def __str__(self):
-        return f"Vertex({str(self.__element)})"
+        return str(self.__element)
 
     def __repr__(self):
-        return str(self)
+        return f"Vertex({str(self.__element)}"

@@ -2,6 +2,8 @@ from Edge import Edge
 from Vertex import Vertex
 from typing import Dict, Set, Iterable, List, Tuple
 from UnionFind import UnionFind
+from csv import reader as CSVread
+from networkx import Graph as nxGraph
 
 DEBUG: bool = False
 
@@ -30,6 +32,7 @@ class Graph:
         uD = self._map.get(u)
         if uD is not None:
             return uD.get(v)
+
     def degree(self, v: Vertex, out=None):
         if out is None:
             return len(self._map[v])
@@ -137,6 +140,35 @@ class Graph:
                 if saveEdges: edgesToRet.append(e)
                 if DEBUG: print(forest)
         return ret, edgesToRet
+
+    @staticmethod
+    def from_csv(file_name: str, isDirected: bool = False) -> "Graph":
+        ret = Graph(isDirected)
+        vNames = {}
+        edges: Set[Tuple[Vertex, Vertex]] = set()
+        with open(file_name, 'r') as f:
+            reader = CSVread(f, delimiter=',')
+            for line in reader:
+                v1, v2 = vNames.get(line[0]), vNames.get(line[1])
+                weight = float(line[2])
+                if vNames.get(line[0]) is None:
+                    v1 = vNames[line[0]] = Vertex(line[0])
+                    ret._insert_vertex(v1)
+                if vNames.get(line[1]) is None:
+                    v2 = vNames[line[1]] = Vertex(line[1])
+                    ret._insert_vertex(v2)
+                if not isDirected:
+                    v1, v2 = sorted((v1, v2), key=lambda v: v.element)
+                if (v1, v2) not in edges:
+                    edges.add((v1, v2)) #TODO how to choose which one is the edge between the same weights
+                    ret._insert_edge(Edge(v1, v2, weight, isDirected))
+        return ret
+
+    def asNxGraph(self) -> nxGraph: # TODO perguntar se é directed ou n
+        ret = nxGraph()
+        ret.add_nodes_from(self._vertices)
+        ret.add_weighted_edges_from(list((e.aresta[0], e.aresta[1], e.peso) for e in self._edges))
+        return ret
 
 
 GraphG = Graph()
