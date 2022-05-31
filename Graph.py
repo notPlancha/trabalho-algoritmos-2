@@ -4,7 +4,7 @@ from typing import Dict, Set, Iterable, List, Tuple
 from UnionFind import UnionFind
 from csv import reader as CSVread
 from networkx import Graph as nxGraph
-
+from tqdm import tqdm
 DEBUG: bool = False
 
 
@@ -160,16 +160,15 @@ class Graph:
                 if not isDirected:
                     v1, v2 = sorted((v1, v2), key=lambda v: v.element)
                 if (v1, v2) not in edges:
-                    edges.add((v1, v2)) #TODO how to choose which one is the edge between the same weights
+                    edges.add((v1, v2))
                     ret._insert_edge(Edge(v1, v2, weight, isDirected))
         return ret
 
-    def asNxGraph(self) -> nxGraph: # TODO perguntar se é directed ou n
+    def asNxGraph(self) -> nxGraph:
         ret = nxGraph()
         ret.add_nodes_from(self._vertices)
         ret.add_weighted_edges_from(list((e.aresta[0], e.aresta[1], e.peso) for e in self._edges))
         return ret
-
 
 GraphG = Graph()
 VertexA = Vertex("A")
@@ -179,8 +178,16 @@ VertexD = Vertex("D")
 VertexE = Vertex("E")
 VertexF = Vertex("F")
 VertexG = Vertex("G")
-for i in [VertexA, VertexB, VertexC, VertexD, VertexE, VertexF, VertexG]:
+l = [VertexA, VertexB, VertexC, VertexD, VertexE, VertexF, VertexG]
+for i in l:
     GraphG.insert_vertex(i)
+# import random
+
+# for i in range(10):
+#     v1 = random.choice(l)
+#     v2 = random.choice(l)
+#     if v1 is not v2:
+#         GraphG.insert_edge(v1, v2, random.randint(1,20))
 GraphG.insert_edge(Edge(VertexC, VertexE, 1))
 GraphG.insert_edge(Edge(VertexA, VertexB, 2))
 GraphG.insert_edge(Edge(VertexA, VertexC, 3))
@@ -193,4 +200,4 @@ GraphG.insert_edge(Edge(VertexF, VertexE, 8))
 GraphG.insert_edge(Edge(VertexF, VertexG, 9))
 if __name__ == "__main__":
     print(GraphG)
-    print(GraphG.kruskal())
+    print(GraphG.kruskal()[0])
