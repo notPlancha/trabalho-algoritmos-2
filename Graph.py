@@ -44,7 +44,7 @@ class Graph:
             else:
                 return sum(b for a, b in self._map[v] if b[1] is v)
 
-    def incident_edges(self, v: Vertex, out: bool | None = None) -> Iterable:
+    def incident_edges(self, v: Vertex, out) -> Iterable:
         if out is None:
             return self._map[v].values()
         else:
@@ -181,13 +181,6 @@ VertexG = Vertex("G")
 l = [VertexA, VertexB, VertexC, VertexD, VertexE, VertexF, VertexG]
 for i in l:
     GraphG.insert_vertex(i)
-# import random
-
-# for i in range(10):
-#     v1 = random.choice(l)
-#     v2 = random.choice(l)
-#     if v1 is not v2:
-#         GraphG.insert_edge(v1, v2, random.randint(1,20))
 GraphG.insert_edge(Edge(VertexC, VertexE, 1))
 GraphG.insert_edge(Edge(VertexA, VertexB, 2))
 GraphG.insert_edge(Edge(VertexA, VertexC, 3))

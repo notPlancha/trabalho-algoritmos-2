@@ -4,9 +4,7 @@ from typing import List, Tuple
 from UnionFind import UnionFind
 
 
-
-
-def kSpanningTree(graph: Graph, k: int = 5) -> Graph:
+def kSpanningTree(graph: Graph, k: int) -> Graph:
     mst, edges = graph.kruskal(saveEdges=True)
     for e in edges[-(k - 1):]:
         mst.remove_edge(e)

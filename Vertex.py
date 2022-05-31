@@ -2,7 +2,7 @@ from typing import Tuple
 
 
 class Vertex:
-    def __init__(self, e, color : None | Tuple[int, int, int] =None): #rgb color
+    def __init__(self, e, color=None): #rgb color
         self.__element = e
         self.color = color
 
