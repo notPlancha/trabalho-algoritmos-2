@@ -1,5 +1,6 @@
 import networkx as nx
 
+import cluster
 from Edge import Edge
 from Vertex import Vertex
 from typing import Dict, Set, Iterable, List, Tuple
@@ -48,7 +49,7 @@ class Graph:
 
     def incident_edges(self, v: Vertex, out=None) -> Iterable:
         if out is None:
-            return self._map[v].values()
+            yield from self._map[v].values()
         else:
             if not self.isDirected:
                 raise AttributeError("Graph is not directed")
@@ -170,7 +171,6 @@ class Graph:
                 else:
                     ret.get_edge(v1, v2).peso += weight
         return ret
-
     def asNxGraph(self) -> nxGraph:
         ret = nxGraph()
         ret.to_directed() if self.isDirected else ret.to_undirected()
@@ -180,32 +180,6 @@ class Graph:
 
         return ret
 
-    def _addToGraphConnections(self, graph: "Graph", v: Vertex):
-        for i in self.incident_edges(v):
-            if i not in graph._edges:
-                v2 = i.opposite(v)
-                if v2 not in graph._vertices:
-                    graph._insert_vertex(v2)
-                graph._insert_edge(i)
-                graph._addToGraphConnections(graph, i.aresta[1])
-
-    def disconnections(self) -> List["Graph"]:  # from biggest to smallest
-        # TODO test
-        vertexs: List[List[Vertex]] = []
-        graphs: List[Graph] = []
-
-        graphs: List[Graph] = []
-        for v in self._vertices:
-            for graph in graphs:
-                if v in graph._vertices:
-                    break
-            else:  # vertice not in any set, therefore is new cluster
-                newGraph = Graph(self.isDirected)
-                newGraph.insert_vertex(v)
-                graphs.append(newGraph)
-                self._addToGraphConnections(newGraph, v)
-
-        return graphs
 
 
 GraphG = Graph()
@@ -232,5 +206,7 @@ GraphG.insert_edge(Edge(VertexF, VertexG, 9))
 if __name__ == "__main__":
     print(GraphG)
     print(GraphG.kruskal()[0])
-    nxg = GraphG.asNxGraph()
-    print(nx.algorithms.community.naive_greedy_modularity_communities(nxg, weight='weight'))
+    nxg = cluster.kSpanningTree(GraphG, 3)
+    print(nxg)
+    nxg = nxg.asNxGraph()
+    nx.draw(nxg)

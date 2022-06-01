@@ -90,10 +90,10 @@ if __name__ == "__main__":
                     sys.exit("k must be an integer")
             if k < 0: k = -k
 
-            # graoh
-            fromFile = fromFile.disconnections()[0]
-            clusters = kSpanningTree(fromFile, k)
-            nxClusters: nx.Graph = clusters.asNxGraph()
+            # graph
+            clusterss = kSpanningTree(fromFile, k)
+            nxClusters: nx.Graph = clusterss.asNxGraph()
+            nxClusters = clean(clusters(nxClusters))[0]
 
             # make pos
             pos = nx.spring_layout(nxClusters, iterations=getIterations(args), seed=getSeed(args))
@@ -101,7 +101,7 @@ if __name__ == "__main__":
             # draw
             plt.figure()
             plt.title("kSpanningTree(k={})".format(k))
-            nx.draw(nxClusters, with_labels=getLabels(args), pos=pos)
+            nx.draw(nxClusters, with_labels=getLabels(args), pos=pos, node_size=10, alpha=0.5)
         # no mst
         else:
 
@@ -135,8 +135,12 @@ if __name__ == "__main__":
         pos = nx.spring_layout(nxFromFile, iterations=getIterations(args), seed=getSeed(args))
         labels = getLabels(args)
         for i in commuities:
-            numpy.random.rand(3, )
-            nx.draw_networkx_nodes(nxFromFile, pos,nodelist=i, node_color=[[random.random(), random.random(), random.random()]], node_size=10, alpha=0.5)
+            nx.draw_networkx_nodes(nxFromFile,
+                                   pos,
+                                   nodelist=i,
+                                   node_color=[[random.random(), random.random(), random.random()]],
+                                   node_size=10,
+                                   alpha=0.2)
         nx.draw_networkx_edges(nxFromFile, pos, alpha=0.5)
         if labels: nx.draw_networkx_labels(nxFromFile, pos)
     # in-comunities #TODO fazer se tiver tempo

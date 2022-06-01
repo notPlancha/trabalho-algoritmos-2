@@ -5,7 +5,7 @@ for i in range(1, 9):
     with open(f"facebook_k_{i}.bat", mode="w") as f:
         f.write("python ../main.py facebook --k {} -no-labels --iterations 3000".format(i))
 
-with open(f"communities_fluid.bat", mode="w") as f:
+with open(f"communities_modularity.bat", mode="w") as f:
     f.write("python ../main.py communities modularity --k {} -no-labels --iterations 3000".format(i))
 
 with open(f"communities_louvain.bat", mode="w") as f:
