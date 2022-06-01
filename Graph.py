@@ -6,7 +6,7 @@ from typing import Dict, Set, Iterable, List, Tuple
 from UnionFind import UnionFind
 from csv import reader as CSVread
 from networkx import Graph as nxGraph
-from tqdm import tqdm
+
 DEBUG: bool = False
 
 
@@ -46,7 +46,7 @@ class Graph:
             else:
                 return sum(b for a, b in self._map[v] if b[1] is v)
 
-    def incident_edges(self, v: Vertex, out) -> Iterable:
+    def incident_edges(self, v: Vertex, out=None) -> Iterable:
         if out is None:
             return self._map[v].values()
         else:
@@ -180,11 +180,30 @@ class Graph:
 
         return ret
 
-    def disconnections(self) -> List["Graph"]: #from biggest to smallest
-        vertexs : List[List[Vertex]] = []
-        graphs : List[Graph] = []
+    def _addToGraphConnections(self, graph: "Graph", v: Vertex):
+        for i in self.incident_edges(v):
+            if i not in graph._edges:
+                v2 = i.opposite(v)
+                if v2 not in graph._vertices:
+                    graph._insert_vertex(v2)
+                graph._insert_edge(i)
+                graph._addToGraphConnections(graph, i.aresta[1])
 
-        # TODO https://en.wikipedia.org/wiki/Flood_fill
+    def disconnections(self) -> List["Graph"]:  # from biggest to smallest
+        # TODO test
+        vertexs: List[List[Vertex]] = []
+        graphs: List[Graph] = []
+
+        graphs: List[Graph] = []
+        for v in self._vertices:
+            for graph in graphs:
+                if v in graph._vertices:
+                    break
+            else:  # vertice not in any set, therefore is new cluster
+                newGraph = Graph(self.isDirected)
+                newGraph.insert_vertex(v)
+                graphs.append(newGraph)
+                self._addToGraphConnections(newGraph, v)
 
         return graphs
 
