@@ -1,3 +1,5 @@
+import networkx as nx
+
 from Edge import Edge
 from Vertex import Vertex
 from typing import Dict, Set, Iterable, List, Tuple
@@ -157,18 +159,35 @@ class Graph:
                 if vNames.get(line[1]) is None:
                     v2 = vNames[line[1]] = Vertex(line[1])
                     ret._insert_vertex(v2)
+
                 if not isDirected:
-                    v1, v2 = sorted((v1, v2), key=lambda v: v.element)
-                if (v1, v2) not in edges:
+                    condition = (v1, v2) not in edges and (v2, v1) not in edges
+                else:
+                    condition = (v1, v2) not in edges
+                if condition:
                     edges.add((v1, v2))
                     ret._insert_edge(Edge(v1, v2, weight, isDirected))
+                else:
+                    ret.get_edge(v1, v2).peso += weight
         return ret
 
     def asNxGraph(self) -> nxGraph:
         ret = nxGraph()
+        ret.to_directed() if self.isDirected else ret.to_undirected()
+
         ret.add_nodes_from(self._vertices)
         ret.add_weighted_edges_from(list((e.aresta[0], e.aresta[1], e.peso) for e in self._edges))
+
         return ret
+
+    def disconnections(self) -> List["Graph"]: #from biggest to smallest
+        vertexs : List[List[Vertex]] = []
+        graphs : List[Graph] = []
+
+        # TODO https://en.wikipedia.org/wiki/Flood_fill
+
+        return graphs
+
 
 GraphG = Graph()
 VertexA = Vertex("A")
