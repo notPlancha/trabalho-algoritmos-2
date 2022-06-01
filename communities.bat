@@ -15,11 +15,4 @@ start bats/communities_fluid_5.bat
 start bats/communities_fluid_6.bat
 start bats/communities_fluid_7.bat
 start bats/communities_fluid_8.bat
-start bats/communities_louvain_1.bat
-start bats/communities_louvain_2.bat
-start bats/communities_louvain_3.bat
-start bats/communities_louvain_4.bat
-start bats/communities_louvain_5.bat
-start bats/communities_louvain_6.bat
-start bats/communities_louvain_7.bat
-start bats/communities_louvain_8.bat
+start bats/communities_louvain.bat

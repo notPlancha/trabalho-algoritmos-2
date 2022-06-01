@@ -152,7 +152,7 @@ class Graph:
             reader = CSVread(f, delimiter=',')
             for line in reader:
                 v1, v2 = vNames.get(line[0]), vNames.get(line[1])
-                weight = float(line[2])
+                weight = int(line[2])
                 if vNames.get(line[0]) is None:
                     v1 = vNames[line[0]] = Vertex(line[0])
                     ret._insert_vertex(v1)
@@ -176,7 +176,7 @@ class Graph:
         ret.to_directed() if self.isDirected else ret.to_undirected()
 
         ret.add_nodes_from(self._vertices)
-        ret.add_weighted_edges_from(list((e.aresta[0], e.aresta[1], e.peso) for e in self._edges))
+        ret.add_weighted_edges_from(list((e.aresta[0], e.aresta[1], int(e.peso)) for e in self._edges))
 
         return ret
 
@@ -232,3 +232,5 @@ GraphG.insert_edge(Edge(VertexF, VertexG, 9))
 if __name__ == "__main__":
     print(GraphG)
     print(GraphG.kruskal()[0])
+    nxg = GraphG.asNxGraph()
+    print(nx.algorithms.community.naive_greedy_modularity_communities(nxg, weight='weight'))

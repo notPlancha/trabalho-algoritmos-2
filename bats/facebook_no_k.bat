@@ -1,1 +1,1 @@
-python main.py facebook -no-labels --
+python main.py facebook -no-labels --iterations 3000

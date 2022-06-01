@@ -2,7 +2,7 @@ import networkx as nx
 
 import Edge
 from Graph import Graph, GraphG
-from typing import List, Tuple
+from typing import List, Tuple, Set
 from UnionFind import UnionFind
 
 
@@ -14,16 +14,13 @@ def kSpanningTree(graph: Graph, k: int) -> Graph:
     return mst
 
 
-def louvain(graph: nx.Graph, k: int):
-    pass  # TODO https://networkx.org/documentation/stable/reference/algorithms/generated/networkx.algorithms.community.louvain.louvain_communities.html#networkx.algorithms.community.louvain.louvain_communities
+def louvain(graph: nx.Graph, seed = None) -> List[Set]:
+    return nx.algorithms.community.louvain_communities(graph, seed=seed)
 
 
-def fluid(graph: nx.Graph, k: int):
-    pass  # TODO https://networkx.org/documentation/stable/reference/algorithms/generated/networkx.algorithms.community.asyn_fluid.asyn_fluidc.html#networkx.algorithms.community.asyn_fluid.asyn_fluidc
+def modularity(graph: nx.Graph):
+    return list(nx.algorithms.community.naive_greedy_modularity_communities(graph, weight="weight"))
 
-
-def draw_communities(graph: nx.Graph, communities: List[Tuple[int, int]], pos):  # TODO check if communities is of type
-    pass  # TODO
 
 
 if __name__ == "__main__":
