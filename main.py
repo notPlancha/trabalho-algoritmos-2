@@ -47,9 +47,16 @@ def getLabels(args):
 if __name__ == "__main__":
     # TODO: make usages
     usages = """
-    usages:
-    example : shows example graph
-    --seed <int> : seed for 
+    usage: 
+    example: show an example graph
+    ramdom: create a random graph
+    --debug: step by step
+    --seed: make a seed
+    facebook: graph with data given
+    --k: make sub graphs
+    -no-labels: 
+    --iterations: iterate a graph
+    
     """
     args = sys.argv[1:]
     if len(args) == 0:
