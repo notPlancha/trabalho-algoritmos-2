@@ -1,0 +1,1 @@
+python ../main.py communities fluid --k 7 -no-labels --iterations 3000
