@@ -23,6 +23,15 @@ if __name__ == "__main__":
     # TODO: make usages
     """
     usage: 
+    example: show an example graph
+    ramdom: create a random graph
+    --debug: step by step
+    --seed: make a seed
+    facebook: graph with data given
+    --k: make sub graphs
+    -no-labels: 
+    --iterations: iterate a graph
+    
     """
     args = sys.argv[1:]
     if "--debug" in args:

@@ -6,7 +6,7 @@ from typing import Dict, Set, Iterable, List, Tuple
 from UnionFind import UnionFind
 from csv import reader as CSVread
 from networkx import Graph as nxGraph
-from tqdm import tqdm
+
 DEBUG: bool = False
 
 
