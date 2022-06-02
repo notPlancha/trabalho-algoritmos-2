@@ -1,1 +1,0 @@
-python ../main.py facebook --k 4 -no-labels --iterations 3000

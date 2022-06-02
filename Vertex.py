@@ -2,9 +2,8 @@ from typing import Tuple
 
 
 class Vertex:
-    def __init__(self, e, color=None): #rgb color
+    def __init__(self, e):
         self.__element = e
-        self.color = color
 
     @property
     def id(self):
