@@ -1,20 +1,14 @@
 with open("facebook_no_k.bat", "w") as f:
-    f.write("python main.py facebook -no-labels --iterations 3000")
-
+    f.write("python main.py facebook -no-labels --iterations 3000 --draw")
+with open(f"communities_louvain_draw.bat", mode="w") as f:
+    f.write("python ../main.py communities louvain -no-labels --iterations 3000 --draw")
 for i in range(1, 9):
     with open(f"facebook_k_{i}.bat", mode="w") as f:
-        f.write("python ../main.py facebook --k {} -no-labels --iterations 3000".format(i))
-
-with open(f"communities_modularity.bat", mode="w") as f:
-    f.write("python ../main.py communities modularity --k {} -no-labels --iterations 3000".format(i))
-
+        f.write("python ../main.py facebook --k {} -no-labels --iterations 3000 --draw".format(i))
+    with open(f"communities_kcliques_{i}.bat", mode="w") as f:
+        f.write("python ../main.py communities kcliques --k {} -mst".format(i))
+    with open(f"communities_kspanningTree_{i}.bat", mode="w") as f:
+        f.write("python ../main.py communities kspanningTree --k {} -mst".format(i))
 with open(f"communities_louvain.bat", mode="w") as f:
-    f.write("python ../main.py communities louvain -no-labels --iterations 3000")
-
-with open("../communities.bat", mode="w") as f:
-    f.write("start bats/facebook_no_k.bat\n")
-    for i in range(1, 9):
-        f.write("start bats/facebook_k_{}.bat\n".format(i))
-    for i in range(1, 9):
-        f.write("start bats/communities_fluid_{}.bat\n".format(i))
-    f.write("start bats/communities_louvain.bat\n")
+    f.write("python ../main.py communities louvain -mst")
+print("done")

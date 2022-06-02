@@ -23,7 +23,7 @@ class Graph:
         return len(self._vertices)
 
     def vertices(self) -> Iterable:
-        return self._map.keys()  # faster than iterating from the set (prob)
+        return self._vertices
 
     def edges_count(self):
         return len(self._edges)
@@ -106,7 +106,6 @@ class Graph:
         del self._map[e.aresta[0]][e.aresta[1]]
         del self._map[e.aresta[1]][e.aresta[0]]
         self._edges.remove(e)
-
     def remove_vertex(self, v: Vertex):
         vEdges = self._map[v]
         self._vertices.remove(v)

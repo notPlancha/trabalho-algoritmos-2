@@ -1,8 +1,8 @@
 import random
 import warnings
-from typing import Tuple, List
-
+from typing import Tuple, List, Iterable
 import numpy
+from networkx import compose
 
 import cluster
 from Graph import GraphG, Graph, l as vertexList
@@ -23,26 +23,45 @@ def clean(G: List[nx.Graph]):
 def clusters(G: nx.Graph) -> List[nx.Graph]:
     return list((G.subgraph(c) for c in nx.connected_components(G)))
 
+
 def getIterations(args):
     if "--iterations" in args:
         try:
             iterations = int(args[args.index("--iterations") + 1])
         except ValueError:
-            sys.exit("iterations must be an integer")
+            raise ValueError("iterations must be an integer")
     else:
         iterations = 30  # default
     return iterations
+
+
 def getSeed(args):
     if "--seed" in args:
         try:
             seed = int(args[args.index("--seed") + 1])
         except ValueError:
-            sys.exit("seed must be an integer")
+            raise ValueError("seed must be an integer")
     else:
         seed = None  # default
     return seed
+
+
+def getK(args):
+    try:
+        k = int(args[args.index("--k") + 1])
+    except ValueError:
+        a = input("Enter k: ")
+        if a.isdigit():
+            k = int(a)
+        else:
+            raise ValueError("k must be an integer")
+    if k < 0: k = -k
+    return k
+
+
 def getLabels(args):
     return "-no-labels" not in args
+
 
 if __name__ == "__main__":
     # TODO: make usages
@@ -79,17 +98,7 @@ if __name__ == "__main__":
         fromFile = Graph.from_csv("FacebookData/Data_Facebook.csv")
         # k = 1 will return the MST with kruskal, else will return clusters from kSpanningTree
         if "--k" in args:
-            # get k
-            try:
-                k = int(args[args.index("--k") + 1])
-            except ValueError:
-                a = input("Enter k: ")
-                if a.isdigit():
-                    k = int(a)
-                else:
-                    sys.exit("k must be an integer")
-            if k < 0: k = -k
-
+            k = getK(args)
             # graph
             clusterss = kSpanningTree(fromFile, k)
             nxClusters: nx.Graph = clusterss.asNxGraph()
@@ -104,7 +113,6 @@ if __name__ == "__main__":
             nx.draw(nxClusters, with_labels=getLabels(args), pos=pos, node_size=10, alpha=0.5)
         # no mst
         else:
-
             # graph
             nxFromFile = fromFile.asNxGraph()
             nxFromFile: nx.Graph = clean(clusters(nxFromFile))[0]
@@ -123,28 +131,39 @@ if __name__ == "__main__":
             typee = args[args.index("communities") + 1]
         except IndexError:
             sys.exit("No type specified")
+        if "-mst" in args: fromFile = fromFile.kruskal()[0]
+        k = getK(args) if typee != "louvain" else False
         nxFromFile = fromFile.asNxGraph()
-        nxFromFile: nx.Graph = clean(clusters(nxFromFile))[0]
+        communities: Iterable
         if typee == "louvain":
             commuities = cluster.louvain(nxFromFile, getSeed(args))
-        elif typee == "modularity":
-            commuities = cluster.modularity(nxFromFile)
+        elif typee == "kcliques":
+            commuities = cluster.kcliques(nxFromFile, k)
+        elif typee == "kspanningtree":
+            # will be msted anyway
+            commuities = clusters(cluster.kSpanningTree(fromFile, k).asNxGraph())
         else:
-            sys.exit("Type must be louvain or modularity")
-        pass #TODO test
-        pos = nx.spring_layout(nxFromFile, iterations=getIterations(args), seed=getSeed(args))
-        labels = getLabels(args)
-        for i in commuities:
-            nx.draw_networkx_nodes(nxFromFile,
-                                   pos,
-                                   nodelist=i,
-                                   node_color=[[random.random(), random.random(), random.random()]],
-                                   node_size=10,
-                                   alpha=0.2)
-        nx.draw_networkx_edges(nxFromFile, pos, alpha=0.5)
-        if labels: nx.draw_networkx_labels(nxFromFile, pos)
-    # in-comunities #TODO fazer se tiver tempo
-    if "in-comunities" in args:
-        warnings.warn("inCouminties not implemented", DeprecationWarning)
-        pass
+            sys.exit("Type must be louvain, kcliques, or kspanningtree")
+        if "--draw" in args:
+            newGraph = nx.Graph()
+            for i in clean(clusters(nxFromFile)):
+                compose(newGraph, i)
+            nxFromFile = newGraph
+            pos = nx.spring_layout(nxFromFile, iterations=getIterations(args), seed=getSeed(args))
+            labels = getLabels(args)
+            for i in commuities:
+                nx.draw_networkx_nodes(nxFromFile,
+                                       pos,
+                                       nodelist=i,
+                                       node_color=[[random.random(), random.random(), random.random()]],
+                                       node_size=10,
+                                       alpha=0.2)
+            nx.draw_networkx_edges(nxFromFile, pos, alpha=0.5)
+            if labels: nx.draw_networkx_labels(nxFromFile, pos)
+        else:
+            with open(f"outputs/communities_{typee}{'_' + str(k) if k else ''}.txt", mode="w") as f:
+                for i in commuities:
+                    sortedI = str(sorted(i, key=lambda v: v.element))
+                    print(sortedI)
+                    f.write(sortedI + "\n")
     plt.show()

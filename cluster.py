@@ -18,13 +18,12 @@ def kSpanningTree(graph: Graph, k: int) -> Graph:
     return mst
 
 
-def louvain(graph: nx.Graph, seed = None) -> List[Set]:
+def louvain(graph: nx.Graph, seed=None) -> List[Set]:
     return nx.algorithms.community.louvain_communities(graph, seed=seed)
 
 
-"""def girvan_newman(graph: nx.Graph):
-    return list(girvan_newman(graph))"""
-
+def kcliques(nxFromFile, k):
+    return nx.algorithms.community.k_clique_communities(nxFromFile, k)
 
 
 if __name__ == "__main__":
