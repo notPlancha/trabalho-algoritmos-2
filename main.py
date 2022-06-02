@@ -134,14 +134,14 @@ if __name__ == "__main__":
         if "-mst" in args: fromFile = fromFile.kruskal()[0]
         k = getK(args) if typee != "louvain" else False
         nxFromFile = fromFile.asNxGraph()
-        communities: Iterable
         if typee == "louvain":
-            commuities = cluster.louvain(nxFromFile, getSeed(args))
+            communities = cluster.louvain(nxFromFile, getSeed(args))
         elif typee == "kcliques":
-            commuities = cluster.kcliques(nxFromFile, k)
+            communities = cluster.kcliques(nxFromFile, k)
         elif typee == "kspanningtree":
             # will be msted anyway
-            commuities = clusters(cluster.kSpanningTree(fromFile, k).asNxGraph())
+
+            communities = clusters(cluster.kSpanningTree(fromFile, k).asNxGraph())
         else:
             sys.exit("Type must be louvain, kcliques, or kspanningtree")
         if "--draw" in args:
@@ -151,7 +151,7 @@ if __name__ == "__main__":
             nxFromFile = newGraph
             pos = nx.spring_layout(nxFromFile, iterations=getIterations(args), seed=getSeed(args))
             labels = getLabels(args)
-            for i in commuities:
+            for i in communities:
                 nx.draw_networkx_nodes(nxFromFile,
                                        pos,
                                        nodelist=i,
@@ -162,7 +162,7 @@ if __name__ == "__main__":
             if labels: nx.draw_networkx_labels(nxFromFile, pos)
         else:
             with open(f"outputs/communities_{typee}{'_' + str(k) if k else ''}.txt", mode="w") as f:
-                for i in commuities:
+                for i in communities:
                     sortedI = str(sorted(i, key=lambda v: v.element))
                     print(sortedI)
                     f.write(sortedI + "\n")

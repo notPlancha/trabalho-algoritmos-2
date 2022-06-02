@@ -1,5 +1,5 @@
 import networkx as nx
-from networkx import minimum_spanning_tree
+from networkx import minimum_spanning_tree, find_cliques
 from networkx.algorithms.community import girvan_newman
 
 import Edge
@@ -23,6 +23,7 @@ def louvain(graph: nx.Graph, seed=None) -> List[Set]:
 
 
 def kcliques(nxFromFile, k):
+    l = sorted(list(find_cliques(nxFromFile)), key= lambda l: len(l), reverse=True)
     return nx.algorithms.community.k_clique_communities(nxFromFile, k)
 
 
